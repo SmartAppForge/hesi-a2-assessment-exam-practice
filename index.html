@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A browser-based HESI A2 practice quiz with two levels, results, answer review and study resources.">
+  <meta name="theme-color" content="#123c55">
+  <title>HESI A2 Assessment Exam Practice</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="config.js"></script>
+  <script defer src="questions.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="HESI A2 Practice home"><span class="brand-mark">H</span><span>HESI A2 <small>ASSESSMENT PRACTICE</small></span></a>
+    <span class="demo-pill">Independent practice</span>
+  </header>
+  <main id="app" class="shell" aria-live="polite">
+    <section class="hero-card">
+      <p class="eyebrow">PRACTICE WITH PURPOSE</p>
+      <h1>Build confidence, one question at a time.</h1>
+      <p class="lead">Take a focused practice quiz, review your results, and invite a colleague to learn alongside you.</p>
+      <div class="hero-stats"><div><strong>40</strong><span>demo questions</span></div><div><strong>2</strong><span>practice levels</span></div><div><strong>Free</strong><span>Level 1 access</span></div></div>
+      <div class="notice"><strong>Demo content notice:</strong> These illustrative questions are not official HESI exam questions. Use them as practice only and supplement them with verified study materials.</div>
+      <button class="primary full" data-action="start-level1">Start free Level 1 <span aria-hidden="true">→</span></button>
+      <p class="microcopy">20 questions · Four answer choices · Results and review</p>
+      <p id="entry-note" class="inline-note" hidden></p>
+    </section>
+    <section class="two-cards">
+      <article class="info-card"><span class="step">01</span><h2>Level 1 — Start here</h2><p>Answer 20 questions and get a clear snapshot of your practice performance.</p><span class="tag">Free access</span></article>
+      <article class="info-card"><span class="step">02</span><h2>Level 2 — Keep going</h2><p>Complete Level 1 to unlock 20 additional demonstration questions and subject-focused recommendations.</p><span class="tag tag-muted">Unlock after Level 1</span></article>
+    </section>
+    <footer class="footer">Independent educational resource. Not affiliated with or endorsed by Elsevier or HESI. No exam result is guaranteed.</footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
