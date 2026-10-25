@@ -3,7 +3,7 @@ window.APP_CONFIG = {
   "app": {
     "name": "HESI A2 Assessment Exam Practice",
     "subtitle": "Practice with purpose. Grow together.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "demoContentNotice": "Demo questions: these are illustrative practice items, not official HESI questions. Validate or replace them before commercial educational release."
   },
   "levels": {
@@ -17,12 +17,13 @@ window.APP_CONFIG = {
       "title": "Level 2 — Extended Practice",
       "start": 21,
       "end": 40,
-      "access": "unlocked-after-level-1-completion"
+      "access": "unlocked-at-70-percent-or-higher-on-level-1"
     }
   },
   "unlock": {
-    "rule": "complete-level-1",
-    "description": "Level 2 unlocks after the user submits all 20 Level 1 questions. Sharing is encouraged but never falsely represented as verified or mandatory.",
+    "rule": "score-at-least-70-percent-on-level-1",
+    "minimumPercent": 70,
+    "description": "Level 2 unlocks after the user answers all 20 Level 1 questions and scores at least 70%. Below 70%, the results screen prompts a Level 1 retry. Sharing is optional and never treated as verified or mandatory.",
     "persistInLocalStorage": true
   },
   "referral": {

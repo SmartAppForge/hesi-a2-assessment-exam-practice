@@ -2,7 +2,7 @@
   "use strict";
   const CONFIG = window.APP_CONFIG;
   const BANK = window.QUESTION_BANK;
-  const STORAGE = { unlocked: "hesiA2Level2Unlocked", answers1: "hesiA2Answers1", answers2: "hesiA2Answers2", referral: "hesiA2ReferralId", referredBy: "hesiA2ReferredBy" };
+  const STORAGE = { unlocked: "hesiA2Level2Unlocked70", answers1: "hesiA2Answers1", answers2: "hesiA2Answers2", referral: "hesiA2ReferralId", referredBy: "hesiA2ReferredBy" };
   const app = document.getElementById("app");
   const toast = document.getElementById("toast");
   let screen = "home";
@@ -82,11 +82,11 @@
         <div class="notice"><strong>Demo content notice:</strong> These illustrative questions are not official HESI exam questions. Validate or replace them before commercial educational release.</div>
         ${button('Start free Level 1 <span aria-hidden="true">→</span>',"start-level1","primary full")}
         <p class="microcopy">20 questions · Four answer choices · Results and review</p>
-        <p id="entry-note" class="inline-note" ${params.get("level")==="2"&&!isUnlocked()?"":"hidden"}>Level 2 is locked. Complete Level 1 first to unlock the extended practice set.</p>
+        <p id="entry-note" class="inline-note" ${params.get("level")==="2"&&!isUnlocked()?"":"hidden"}>Level 2 is locked. Score at least 70% on Level 1 to unlock the extended practice set.</p>
         <div class="divider"></div>
         <div class="two-cards">
           <article class="info-card"><span class="step">01</span><h2>Level 1 — Start here</h2><p>Answer 20 questions and get a clear snapshot of your practice performance.</p><span class="tag">Free access</span></article>
-          <article class="info-card"><span class="step">02</span><h2>Level 2 — Keep going</h2><p>Complete Level 1 to unlock 20 additional demonstration questions and subject-focused recommendations.</p><span class="tag tag-muted">${isUnlocked()?"Unlocked on this browser":"Unlock after Level 1"}</span><div class="button-row">${button(isUnlocked()?"Continue to Level 2":"How to unlock Level 2",isUnlocked()?"start-level2":"show-unlock","ghost")}</div></article>
+          <article class="info-card"><span class="step">02</span><h2>Level 2 — Keep going</h2><p>Score at least 70% on Level 1 to unlock 20 additional demonstration questions and subject-focused recommendations.</p><span class="tag tag-muted">${isUnlocked()?"Unlocked on this browser":"Unlock at 70%+"}</span><div class="button-row">${button(isUnlocked()?"Continue to Level 2":"How to unlock Level 2",isUnlocked()?"start-level2":"show-unlock","ghost")}</div></article>
         </div>
       </section>
       <footer class="footer">Independent educational resource. Not affiliated with or endorsed by Elsevier or HESI. No exam result is guaranteed.</footer>`;
@@ -117,8 +117,8 @@
     screen="unlock";
     app.innerHTML=`<section class="content-card">
       <p class="eyebrow">LEVEL 2 ACCESS</p><h1>You've taken the first step. Keep the momentum going.</h1>
-      <p class="lead">Level 2 adds 20 more demonstration questions. In this first version, access is unlocked after submitting Level 1. Sharing your result is optional — we encourage it because a supportive study community helps everyone keep learning.</p>
-      <div class="notice"><strong>Access rule:</strong> Complete and submit all 20 Level 1 questions. No share-click is treated as proof of an invitation or referral.</div>
+      <p class="lead">Level 2 adds 20 more demonstration questions. In this version, access is unlocked after scoring at least 70% on Level 1. Sharing your result is optional — we encourage it because a supportive study community helps everyone keep learning.</p>
+      <div class="notice"><strong>Access rule:</strong> Answer all 20 Level 1 questions and score at least 70% to unlock Level 2. If your score is lower, retry Level 1. Sharing is optional; no share-click is treated as proof of a referral.</div>
       ${button(isUnlocked()?"Start Level 2 →":"Start Level 1 to unlock","start-level1","primary full")}
       <div class="button-row">${button("Back to home","home","ghost")}</div>
     </section>`;
@@ -133,7 +133,8 @@
     }
     const result=resultFor(activeLevel); lastResults[activeLevel]=result;
     if (activeLevel===1) {
-      localStorage.setItem(STORAGE.unlocked,"true");
+      if (result.percent >= CONFIG.unlock.minimumPercent) localStorage.setItem(STORAGE.unlocked,"true");
+      else localStorage.removeItem(STORAGE.unlocked);
       storeAnswers(1);
       renderResults(1);
     } else {
@@ -163,9 +164,10 @@
     const r=lastResults[level]||resultFor(level);
     const stats=subjectStats(level);
     const recommendation=stats.length?`Consider reviewing <strong>${esc(stats[0].name)}</strong> first (${stats[0].pct}% on this small practice set), then revisit your trusted study guide and try another session.`:CONFIG.recommendations.fallback;
+    const passed = r.percent >= CONFIG.unlock.minimumPercent;
     const next=level===1
-      ? `<section class="copy-panel"><h2 class="section-title">Ready for the next challenge?</h2><p>You've completed the first 20 questions — that's progress worth celebrating. Level 2 is now unlocked on this browser. Continue learning, and invite a classmate to take the same quiz so you can encourage one another.</p>${button("Unlock confirmed — continue to Level 2 →","start-level2","primary full")}</section>`
-      : `<section class="copy-panel"><h2 class="section-title">Keep your learning moving</h2><p>Your result is one data point, not a definition of your ability. Use it to choose a topic to review, practice again, and support a colleague who's preparing too.</p>${button("Explore study resources ↓","show-offers","primary full")}</section>`;
+      ? `<section class="copy-panel"><h2 class="section-title">${passed?"Ready for the next challenge?":"One more try can move you forward."}</h2><p>${passed?`Great work — you scored ${r.percent}%, meeting the ${CONFIG.unlock.minimumPercent}% threshold. Level 2 is now unlocked on this browser. Keep learning and invite a classmate to practise with you.`:`You scored ${r.percent}%. Level 2 unlocks when you score at least ${CONFIG.unlock.minimumPercent}% on Level 1. Review your answers, focus on the topics to strengthen, and try again — progress comes one question at a time.`}</p>${button(passed?"Start Level 2 →":"Retry Level 1 ↻",passed?"start-level2":"retry-level","primary full")}</section>`
+      : `<section class="copy-panel"><h2 class="section-title">Keep your learning moving</h2><p>Your result is one data point, not a definition of your ability. Use it to choose a topic to review, practise again, and support a colleague who's preparing too.</p>${button("Explore study resources ↓","show-offers","primary full")}</section>`;
     app.innerHTML=`<section class="content-card">
       <p class="eyebrow">${level===1?"LEVEL 1 COMPLETE":"LEVEL 2 COMPLETE"}</p><h1>${level===1?"You showed up. That matters.":"You've kept going — celebrate that progress."}</h1>
       <p class="lead">${esc(encouragement(r.percent))}</p>
@@ -178,15 +180,17 @@
       <section><h2 class="section-title">Your next best study step</h2><p>${recommendation}</p><div class="subject-list">${stats.map(s=>`<div class="subject-row"><span>${esc(s.name)}</span><div class="subject-track"><span style="width:${s.pct}%"></span></div><strong>${s.pct}%</strong></div>`).join("")}</div></section>
       ${next}
       <div class="button-row">${button("Review answers","review-answers","ghost")}${button("Try this level again","retry-level","ghost")}${button("Home","home","ghost")}</div>
-      ${level===2?offersMarkup(): ""}
+      ${offersMarkup()}
       <p class="footer">Practice score only. This result does not predict or guarantee performance on an official exam.</p>
     </section>`;
   }
   function offersMarkup() {
     const offers=CONFIG.offers.filter(o=>o.display);
-    return `<section id="offers"><h2 class="section-title">A practical next step for your study routine</h2><p class="lead">Use this free practice session to identify what to review. When you are ready, explore these digital study resources and check each product page for its current details.</p>
-      <div class="offer-grid">${offers.map(o=>`<article class="offer-card ${o.id==="ebook-app"?"featured":""}"><span class="tag">${o.id==="ebook-app"?"Recommended combo":o.id==="bundle"?"Multi-product bundle":"Study resource"}</span><h3>${esc(o.name)}</h3><div class="price">${esc(o.price)}</div><p>${esc(o.description)}</p><a class="${o.id==="ebook-app"?"primary":"ghost"}" href="${esc(safeUrl(o.url))}" target="_blank" rel="noopener noreferrer">View on Gumroad →</a></article>`).join("")}</div>
-      <p class="small-muted">Prices and contents should be checked on Gumroad before purchase. No discount or savings claim is made here.</p>
+    const colors={"reactive-app":"blue",ebook:"green","ebook-app":"orange",bundle:"purple"};
+    const labels={"reactive-app":"Practice App",ebook:"Ebook","ebook-app":"Ebook + App Bundle",bundle:"NCLEX & Exam Prep Bundle"};
+    return `<section id="offers" class="offers-section"><div class="offers-intro"><p class="eyebrow">KEEP LEARNING</p><h2>Great work! Keep growing your HESI A2 confidence.</h2><p>Choose the study resource that fits your next step. Build knowledge, practise consistently, and share helpful resources with classmates.</p></div>
+      <div class="offer-grid">${offers.map(o=>`<article class="offer-card offer-card--${colors[o.id]||"blue"}"><span class="offer-arrow" aria-hidden="true">↓</span><span class="offer-icon" aria-hidden="true">${o.id==="reactive-app"?"●":o.id==="ebook"?"▤":o.id==="ebook-app"?"● + ▤":"✦"}</span><h3>${esc(labels[o.id]||o.name)}</h3><div class="price">${esc(o.price)}</div><p>${esc(o.description)}</p><a class="offer-button" href="${esc(safeUrl(o.url))}" target="_blank" rel="noopener noreferrer">${o.id==="reactive-app"?"Get the Practice App →":o.id==="ebook"?"Get the Ebook →":o.id==="ebook-app"?"Get the Bundle →":"Explore the Bundle →"}</a></article>`).join("")}</div>
+      <p class="small-muted promo-note">Prices and product contents should be confirmed on Gumroad. No exam result is guaranteed.</p>
     </section>`;
   }
   function showOffers() {
@@ -230,7 +234,7 @@
   window.addEventListener("error",()=>notify("Something went wrong. Refresh the page and try again."));
   window.addEventListener("unhandledrejection",()=>notify("An operation could not be completed. Please try again."));
   function validateSetup() {
-    if (!CONFIG || !Array.isArray(BANK) || BANK.length!==40) {
+    if (!CONFIG || !CONFIG.unlock || CONFIG.unlock.minimumPercent!==70 || !Array.isArray(BANK) || BANK.length!==40) {
       app.innerHTML='<section class="content-card"><h1>Setup issue</h1><p>The question bank or configuration is missing or incomplete. Check that config.js, questions.js, and app.js are all uploaded.</p></section>'; return false;
     }
     const ids=new Set(BANK.map(q=>q.id));

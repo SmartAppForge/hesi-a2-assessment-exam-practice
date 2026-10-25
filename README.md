@@ -1,4 +1,4 @@
-# HESI A2 Assessment Exam Practice — v1.0.0
+# HESI A2 Assessment Exam Practice — v1.1.0
 
 A dependency-free static web app for GitHub Pages. English interface; no build step required.
 
@@ -9,7 +9,7 @@ All 40 included questions are **illustrative demonstration questions** created t
 - `index.html` — app shell and script loading order.
 - `styles.css` — responsive UI and accessibility-minded styling.
 - `app.js` — quiz flow, results, answer review, sharing, unlock rule, recommendations, offer rendering and basic integrity checks.
-- `config.js` — central configuration for level rules, referral behavior, Gumroad offers/prices/URLs and analytics status.
+- `config.js` — central configuration for level rules, referral behavior, Gumroad offers/prices/URLs and analytics status. The results-page cards are rendered only after a quiz result; no offers are shown on Home or during the quiz.
 - `questions.js` — question bank, with Q1–Q20 for Level 1 and Q21–Q40 for Level 2.
 
 ## Run locally
@@ -25,7 +25,7 @@ All 40 included questions are **illustrative demonstration questions** created t
 5. Open the published URL and test the journeys in the checklist below.
 
 ## Access rule
-Level 2 unlocks after the user answers all 20 Level 1 questions and submits the level. The unlock is saved in this browser's `localStorage`. Sharing is encouraged but not required and is never falsely treated as proof of a referral.
+Level 2 unlocks after the user answers all 20 Level 1 questions and scores at least 70%. If the score is below 70%, the results page shows “Retry Level 1 ↻”. At 70% or above, it shows “Start Level 2 →”. The unlock is saved in this browser's `localStorage`. Sharing is encouraged but not required and is never falsely treated as proof of a referral.
 
 ## Important static-hosting limitations
 - `localStorage` is browser/device-specific. Clearing browser data or switching device/browser can remove the unlock.
@@ -39,7 +39,7 @@ Level 2 unlocks after the user answers all 20 Level 1 questions and submits the 
 ## Configuration
 Edit `config.js`:
 - `levels` — level names and question ranges.
-- `unlock.rule` — currently `complete-level-1`.
+- `unlock.rule` — currently `score-at-least-70-percent-on-level-1`; `unlock.minimumPercent` is set to `70`.
 - `referral.parameter` and `referral.localTrackingOnly`.
 - `offers` — product names, displayed prices, descriptions and Gumroad URLs.
 - `analytics.enabled` — currently `false`; a provider and privacy review are needed before enabling analytics.
@@ -56,9 +56,11 @@ Edit `questions.js` to replace the demo question bank. Keep unique IDs, 20 quest
 7. A fresh browser with `?level=2` cannot start Level 2 without completing Level 1.
 8. Level 2 has Q21–Q40, a separate score and result page.
 9. Review answers shows chosen/correct answers and explanations.
-10. Level 2 result shows recommendations and the four configured Gumroad offers.
-11. Broken/missing question configuration displays a setup error rather than a false success.
-12. Direct source inspection confirms that this is client-side gating, not secure access control.
+10. Both Level 1 and Level 2 results show the promotional banner and four configured Gumroad offer cards (blue, green, orange, purple).
+11. A Level 1 score of 70% or higher shows “Start Level 2 →” and unlocks Level 2.
+12. A Level 1 score below 70% shows “Retry Level 1 ↻” and keeps Level 2 locked.
+13. Broken/missing question configuration displays a setup error rather than a false success.
+14. Direct source inspection confirms that this is client-side gating, not secure access control.
 
 ## Before production
 - Replace/approve all demonstration questions and explanations.
